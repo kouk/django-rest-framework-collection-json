@@ -4,6 +4,7 @@ from rest_framework.relations import (
 )
 from rest_framework.serializers import HyperlinkedModelSerializer
 from rest_framework.renderers import JSONRenderer
+from rest_framework.settings import api_settings
 
 from .fields import LinkField
 
@@ -28,7 +29,7 @@ class CollectionJsonRenderer(JSONRenderer):
 
     def _get_id_field(self, serializer):
         if isinstance(serializer, HyperlinkedModelSerializer):
-            return serializer.opts.url_field_name
+            return api_settings.URL_FIELD_NAME
         else:
             return None
 
