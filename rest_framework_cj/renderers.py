@@ -145,6 +145,31 @@ class CollectionJsonRenderer(JSONRenderer):
         else:
             collection.update(self._get_items_and_links(view, data))
 
+        if hasattr(view, 'filter_class'):
+            href = request.build_absolute_uri(request.path)
+            fields = []
+            labels = []
+            model = getattr(view, 'model',
+                            getattr(view.queryset, 'model'))
+            for f, obj in view.filter_class().filters.items():
+                fields.append({
+                    "name": f,
+                    "value": ""
+                })
+                labels.append(getattr(obj, 'label') or f)
+            prompt = 'filter {} on {}'.format(
+                model._meta.verbose_name_plural.title(),
+                ", ".join(labels))
+            collection.update({
+                'queries': [
+                    {
+                        'href': href,
+                        'rel': 'search',
+                        'prompt': prompt,
+                        'data': fields
+                    }]
+                })
+
         return {'collection': collection}
 
     def get_href(self, request):
